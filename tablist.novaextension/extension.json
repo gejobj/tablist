@@ -1,0 +1,39 @@
+{
+  "identifier": "gerardojbueno.tablist",
+  "name": "Tab List",
+  "organization": "Gerardo J. Bueno",
+  "description": "Tab list sidebar",
+  "version": "1.0",
+  "bugs": "http://",
+  "categories": ["sidebars"],
+  "main": "main.js",
+  "activationEvents": ["onLanguage:javascript"],
+  "entitlements": {},
+  "sidebars": [
+    {
+      "id": "tablist",
+      "name": "TabList",
+      "smallImage": "tablist-small",
+      "smallSelectedImage": "tablist-small-selected",
+      "largeImage": "tablist-large",
+      "largeSelectedImage": "tablist-large-selected",
+      "sections": [
+        {
+          "id": "tablist",
+          "name": "Open files in tabs",
+          "allowMultiple": true,
+          "placeholderText": "No files have been created.",
+          "placeholderImage": "tablist-placeholder",
+          "headerCommands": [
+            {
+              "title": "Reload",
+              "image": "__builtin.refresh",
+              "tooltip": "Reload TabList",
+              "command": "tablist.refresh"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

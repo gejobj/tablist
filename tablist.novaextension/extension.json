@@ -3,15 +3,13 @@
   "name": "Tab List",
   "organization": "Gerardo J. Bueno",
   "description": "Tab list sidebar",
-  "version": "1.0.2",
+  "version": "2.0",
   "bugs": "https://github.com/gejobj/tablist/issues",
   "repository": "https://github.com/gejobj/tablist",
   "license": "MIT",
   "keywords": ["sidebar", "tab", "tabs", "document list"],
   "categories": ["sidebars"],
   "main": "main.js",
-  "activationEvents": ["onLanguage:javascript"],
-  "entitlements": {},
   "sidebars": [
     {
       "id": "tablist",
@@ -29,6 +27,12 @@
           "placeholderImage": "tablist-placeholder",
           "headerCommands": [
             {
+              "title": "grouped",
+              "image": "__builtin.branch",
+              "tooltip": "Switch TabList view",
+              "command": "tablist.grouped"
+            },
+             {
               "title": "Reload",
               "image": "__builtin.refresh",
               "tooltip": "Reload TabList",
@@ -37,6 +41,39 @@
           ]
         }
       ]
+    }
+  ],
+  "config": [
+    {
+        "key": "gerardojbueno.tablist.config.sectionMain",
+        "title": "Settings",
+        "description": "Simple or grouped mode:",
+        "type": "section",
+        "children": [
+            {
+                "key": "gerardojbueno.tablist.config.grouped",
+                "title": "grouped",
+                "type": "boolean",
+                "default": false
+            }
+          ]
+    }
+  ],
+  "configWorkspace": [
+    {
+        "key": "gerardojbueno.tablist.workspace.sectionMain",
+        "title": "Configuration",
+        "type": "section",
+        "children": [
+            {
+                "key": "gerardojbueno.tablist.workspace.grouped",
+                "title": "List Type",
+                "type": "enum",
+                "values": [[null, "Use global settings"], [true, "Grouped"], [false, "Ungrouped"]],
+                "radio": false,
+                "default": null
+            }
+        ]
     }
   ]
 }

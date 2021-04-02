@@ -2,8 +2,13 @@
 var treeView = null;
 var treeTabs = null;
 var interval = null;
+var grouped = false;
 
-function create_treeView() {
+const config = {
+    grouped: false
+};
+
+function create_treeView(grouped) {
     
     // Create the TreeView
     treeView = new TreeView("tablist", {
@@ -11,8 +16,10 @@ function create_treeView() {
     });
     
     treeView.onDidChangeSelection((selection) => {
-        // console.log("New selection: " + selection.map((e) => e.name));
-        nova.workspace.openFile(selection.map((e) => e.uri));
+        //console.log("New selection: " + selection.map((e) => e.name));
+        if ( selection.map((e) => e.rootnode) == 'false' ) {
+            nova.workspace.openFile(selection.map((e) => e.uri));
+        }
     });
     
     treeView.onDidExpandElement((element) => {
@@ -32,16 +39,49 @@ function create_treeView() {
 
 }
 
+function updateConfigFromWorkspace(newVal) {
+    const key = this;
+    if (newVal === null) {
+        config[key] = nova.config.get("gerardojbueno.tablist.config."+key);
+    } else {
+        config[key] = newVal;
+    }
+}
+
+function updateConfigFromGlobal(newVal) {
+    const key = this;
+    const workspaceConfig = nova.workspace.config.get("gerardojbueno.tablist.workspace."+key);
+    if (workspaceConfig === null) {
+        config[key] = newVal;
+    }
+}
+
 exports.activate = function() {
     
+    Object.keys(config).forEach(key => {
+        
+        config[key] = nova.workspace.config.get("gerardojbueno.tablist.workspace."+key);
+        if (config[key] === null) {
+            config[key] = nova.config.get("gerardojbueno.tablist.config."+key);
+        }
+        
+        if ( key == 'grouped' ) {
+            grouped = config[key];
+        }
+        
+        nova.workspace.config.onDidChange("gerardojbueno.tablist.workspace."+key, updateConfigFromWorkspace, key);
+        nova.config.onDidChange("gerardojbueno.tablist.config."+key, updateConfigFromGlobal, key);
+        
+    });
+    
     // Do work when the extension is activated
-    create_treeView();
+    create_treeView(config.grouped);
     
     // REFRESH TREE ON FILE OPEN AND CLOSE
     nova.workspace.onDidAddTextEditor((editor) => {
         
         if ( treeView != null && treeTabs.length != nova.workspace.textDocuments.length ) {
-            create_treeView();
+            create_treeView(grouped);
         }
         
         editor.onDidDestroy(destroyedEditor => {
@@ -50,9 +90,7 @@ exports.activate = function() {
                 return editor.document.uri === destroyedEditor.document.uri;
             });
             
-            //console.log(destroyedEditor.document.uri);
-            
-            setTimeout(function(){ create_treeView(); }, 1000);
+            setTimeout(function(){ create_treeView(grouped); }, 1000);
             
         });
         
@@ -73,13 +111,28 @@ exports.deactivate = function() {
     
 }
 
-
 nova.commands.register("tablist.refresh", () => {
     
     // Invoked when the "add" header button is clicked
     
     if (treeView != null) {
-        create_treeView();
+        create_treeView(grouped);
+    }
+    
+});
+
+nova.commands.register("tablist.grouped", () => {
+    
+    if ( grouped ) {
+        grouped = false;
+    } else {
+        grouped = true;
+    }
+    
+    // Invoked when the "add" header button is clicked
+    
+    if (treeView != null) {
+        create_treeView(grouped);
     }
     
 });
@@ -98,12 +151,19 @@ class TabFile {
     
     constructor(uri) {
         
+        this.rootnode = true;
         this.uri = uri;
         this.name = uri.substring(uri.lastIndexOf('/')+1);
         this.extension = this.name.substring(this.name.lastIndexOf('.')+1);
-        //this.parent = null;
-        //this.children = [];
+        this.parent = null;
+        this.children = [];
         
+    }
+    
+    addChild(element) {
+        element.parent = this;
+        element.rootnode = false;
+        this.children.push(element);
     }
     
 }
@@ -120,20 +180,56 @@ class TabListProvider {
     createTabTree() {
         
         let rootItems = [];
+        let rootItem = [];
+        let found = false;
         
         for ( let i=0; i < nova.workspace.textDocuments.length; i++ ) {
             
             let tabelement = new TabFile(nova.workspace.textDocuments[i].uri);
             
-            rootItems.push(tabelement);
+            if ( grouped ) {
+                
+                found = false;
+                
+                for ( let i = 0; i < rootItems.length; i++ ) {
+                    
+                    if ( rootItems[i].extension == tabelement.extension ) {
+                        
+                        found = true;
+                        rootItems[i].addChild(tabelement);
+                        
+                        break;
+                        
+                    }
+                    
+                }
+                
+                if ( !found ) {
+                    
+                    rootItem = new TabFile('/file.'+tabelement.extension);
+                    rootItems.push(rootItem);
+                    
+                    rootItems[rootItems.length - 1].addChild(tabelement);
+                }
+                
+            } else {
+                
+                rootItems.push(tabelement);
+                
+            }
             
         }
         
         // ARRAY SORT
         rootItems.sort(this.sortByFileName);
         
-        this.rootItems = rootItems;
+        if ( grouped ) {
+            for ( let i = 0; i < rootItems.length; i++ ) {
+                rootItems[i].children.sort(this.sortByFileName);
+            }
+        }
         
+        this.rootItems = rootItems;
         treeTabs = rootItems;
         
     }
@@ -176,10 +272,24 @@ class TabListProvider {
         }
         */
         
-        item.image = "__filetype."+element.extension;
-        //item.command = "tablist.doubleClick";
-        item.tooltip = decodeURI(element.uri.replace(/^.*?\/Users\//g,'/Users/'));
-        item.contextValue = "info";
+        if ( element.children.length > 0 ) {
+            
+            item.name = item.name.replace(/^file\./g,'');
+            item.collapsibleState = TreeItemCollapsibleState.Expanded;
+            item.image = "__filetype."+element.extension;
+            //item.command = "tablist.doubleClick";
+            item.tooltip = 'node';
+            item.contextValue = "info";
+            item.descriptiveText  = "(" + element.children.length + ")";
+            
+        } else {
+            
+            item.image = "__filetype."+element.extension;
+            //item.command = "tablist.doubleClick";
+            item.tooltip = decodeURI(element.uri.replace(/^.*?\/Users\//g,'/Users/'));
+            item.contextValue = "info";
+            
+        }
         
         return item;
         

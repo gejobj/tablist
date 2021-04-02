@@ -1,7 +1,7 @@
 # tablist
 Nova extension
 
-![alt text](https://github.com/gejobj/tablist/raw/master/preview.png)
+![alt text](https://github.com/gejobj/tablist/raw/main/preview.png)
 
 This is a nova sidebar extension. It allows you to view the names of the files that you have in open tabs.
 

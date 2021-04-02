@@ -12,6 +12,7 @@ function create_treeView() {
     
     treeView.onDidChangeSelection((selection) => {
         // console.log("New selection: " + selection.map((e) => e.name));
+        nova.workspace.openFile(selection.map((e) => e.uri));
     });
     
     treeView.onDidExpandElement((element) => {
@@ -29,12 +30,6 @@ function create_treeView() {
     // TreeView implements the Disposable interface
     nova.subscriptions.add(treeView);
 
-}
-
-function hola_q_ase() {
-    
-    console.log('KKK');
-    
 }
 
 exports.activate = function() {
@@ -89,7 +84,7 @@ nova.commands.register("tablist.refresh", () => {
     
 });
 
-
+/* DOUBLE CLICK DISABLED
 nova.commands.register("tablist.doubleClick", () => {
     // Invoked when an item is double-clicked
     let selection = treeView.selection;
@@ -97,7 +92,7 @@ nova.commands.register("tablist.doubleClick", () => {
     nova.workspace.openFile(selection.map((e) => e.uri));
     
 });
-
+*/
 
 class TabFile {
     
@@ -182,7 +177,8 @@ class TabListProvider {
         */
         
         item.image = "__filetype."+element.extension;
-        item.command = "tablist.doubleClick";
+        //item.command = "tablist.doubleClick";
+        item.tooltip = decodeURI(element.uri.replace(/^.*?\/Users\//g,'/Users/'));
         item.contextValue = "info";
         
         return item;

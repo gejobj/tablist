@@ -16,8 +16,7 @@ function create_treeView(grouped) {
     });
     
     treeView.onDidChangeSelection((selection) => {
-        //console.log("New selection: " + selection.map((e) => e.name));
-        if ( selection.map((e) => e.rootnode) == 'false' ) {
+        if ( (grouped === true && selection.map((e) => e.rootnode) == 'false') || grouped === false ) {
             nova.workspace.openFile(selection.map((e) => e.uri));
         }
     });

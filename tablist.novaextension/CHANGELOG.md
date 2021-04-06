@@ -1,3 +1,7 @@
+## Version 2.0.1
+
+- Fixed an onClick bug in ungrouped mode
+
 ## Version 2.0
 
 - Create new grouped style view

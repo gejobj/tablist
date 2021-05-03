@@ -152,7 +152,7 @@ class TabFile {
         
         this.rootnode = true;
         this.uri = uri;
-        this.name = uri.substring(uri.lastIndexOf('/')+1);
+        this.name = decodeURIComponent(uri.substring(uri.lastIndexOf('/')+1));
         this.extension = this.name.substring(this.name.lastIndexOf('.')+1);
         this.parent = null;
         this.children = [];

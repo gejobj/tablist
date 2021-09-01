@@ -10,6 +10,9 @@ const config = {
 
 function create_treeView(grouped) {
     
+    var localfile = false;
+    var remotefile = '';
+    
     // Create the TreeView
     treeView = new TreeView("tablist", {
         dataProvider: new TabListProvider()
@@ -17,7 +20,17 @@ function create_treeView(grouped) {
     
     treeView.onDidChangeSelection((selection) => {
         if ( (grouped === true && selection.map((e) => e.rootnode) == 'false') || grouped === false ) {
-            nova.workspace.openFile(selection.map((e) => e.uri));
+            // If local...
+            localfile = /^file:/.test(selection.map((e) => e.uri));
+            if ( localfile ) {
+                nova.workspace.openFile(selection.map((e) => e.uri));
+            } else {
+                nova.workspace.showErrorMessage('Sorry, I can only open local files.')
+                /*
+                nova.workspace.openFile(selection.map((e) => e.uri));
+                */
+            }
+            
         }
     });
     

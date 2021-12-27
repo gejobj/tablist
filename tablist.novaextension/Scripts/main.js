@@ -170,6 +170,13 @@ class TabFile {
         this.parent = null;
         this.children = [];
         
+        // Added last directory to the name
+        let lastDirectory = uri.split('/').slice(0,-1).join('/').match(/([^\/]*)\/*$/)[1];
+        
+        if ( lastDirectory.length > 0 ) {
+            this.name = lastDirectory+'/'+this.name;
+        }
+        
     }
     
     addChild(element) {
@@ -222,6 +229,7 @@ class TabListProvider {
                     rootItems.push(rootItem);
                     
                     rootItems[rootItems.length - 1].addChild(tabelement);
+                    
                 }
                 
             } else {
@@ -301,6 +309,19 @@ class TabListProvider {
             item.tooltip = decodeURI(element.uri.replace(/^.*?\/Users\//g,'/Users/'));
             item.contextValue = "info";
             
+            /*
+            if ( item.name.indexOf('/') > 0 ) {
+                let arrItemName = item.name.split('/');
+                item.name = arrItemName[1];
+                item.descriptiveText = arrItemName[0];
+            }
+            */
+            
+            if ( item.name.indexOf('/') > 0 ) {
+                let arrItemName = item.name.split('/');
+                item.name = arrItemName[0]+' - '+arrItemName[1];
+            }
+            
         }
         
         return item;
@@ -309,8 +330,11 @@ class TabListProvider {
     
     sortByFileName(a, b) {
         
-        a = nova.path.basename(a['uri']).toLowerCase();
-        b = nova.path.basename(b['uri']).toLowerCase();
+        //a = nova.path.basename(a['name']).toLowerCase();
+        //b = nova.path.basename(b['name']).toLowerCase();
+        
+        a = a['name'].toLowerCase();
+        b = b['name'].toLowerCase();
         
         return a > b ? 1 : b > a ? -1 : 0;   
         

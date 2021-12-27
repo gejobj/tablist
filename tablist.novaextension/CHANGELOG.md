@@ -1,3 +1,8 @@
+## Version 2.0.4
+
+- Added directory name to file name
+- Sort file name changes
+
 ## Version 2.0.3
 
 - Remote file alert information

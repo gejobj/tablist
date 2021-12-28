@@ -309,19 +309,19 @@ class TabListProvider {
             item.tooltip = decodeURI(element.uri.replace(/^.*?\/Users\//g,'/Users/'));
             item.contextValue = "info";
             
-            /*
+            // Directory after name
             if ( item.name.indexOf('/') > 0 ) {
                 let arrItemName = item.name.split('/');
                 item.name = arrItemName[1];
-                item.descriptiveText = arrItemName[0];
+                item.descriptiveText = '- '+arrItemName[0];
             }
-            */
             
+            /* // Directory before name
             if ( item.name.indexOf('/') > 0 ) {
                 let arrItemName = item.name.split('/');
                 item.name = arrItemName[0]+' - '+arrItemName[1];
             }
-            
+            */
         }
         
         return item;
@@ -333,8 +333,17 @@ class TabListProvider {
         //a = nova.path.basename(a['name']).toLowerCase();
         //b = nova.path.basename(b['name']).toLowerCase();
         
-        a = a['name'].toLowerCase();
-        b = b['name'].toLowerCase();
+        if ( a['name'].indexOf('/') > 0 ) {
+            a = a['name'].split('/')[1].toLowerCase();
+        } else {
+            a = a['name'].toLowerCase();
+        }
+        
+        if ( b['name'].indexOf('/') > 0 ) {
+            b = b['name'].split('/')[1].toLowerCase();
+        } else {
+            b = b['name'].toLowerCase();
+        }
         
         return a > b ? 1 : b > a ? -1 : 0;   
         

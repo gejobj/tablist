@@ -313,7 +313,9 @@ class TabListProvider {
             if ( item.name.indexOf('/') > 0 ) {
                 let arrItemName = item.name.split('/');
                 item.name = arrItemName[1];
-                item.descriptiveText = '- '+arrItemName[0];
+                if ( /^:/.test(arrItemName[0]) !== true ) {
+                    item.descriptiveText = '- '+arrItemName[0];
+                }
             }
             
             /* // Directory before name

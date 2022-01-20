@@ -1,3 +1,7 @@
+## Version 2.0.6
+
+- Fixed root ftp directory name
+
 ## Version 2.0.5
 
 - Change directory name after file name

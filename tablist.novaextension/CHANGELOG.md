@@ -1,3 +1,7 @@
+## Version 2.0.7
+
+- Added double click to filename to open a file to fix: https://github.com/gejobj/tablist/issues/5 
+
 ## Version 2.0.6
 
 - Fixed root ftp directory name

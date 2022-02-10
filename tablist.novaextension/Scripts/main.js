@@ -159,6 +159,21 @@ nova.commands.register("tablist.doubleClick", () => {
 });
 */
 
+nova.commands.register("tablist.doubleClick", () => {
+    
+    // Invoked when an item is double-clicked
+    let selection = treeView.selection;
+    
+    // If local...
+    localfile = /^file:/.test(selection.map((e) => e.uri));
+    if ( localfile ) {
+        nova.workspace.openFile(selection.map((e) => e.uri));
+    } else {
+        nova.workspace.showErrorMessage('Sorry, I can only open local files.')
+    }
+    
+});
+
 class TabFile {
     
     constructor(uri) {
@@ -305,7 +320,7 @@ class TabListProvider {
         } else {
             
             item.image = "__filetype."+element.extension;
-            //item.command = "tablist.doubleClick";
+            item.command = "tablist.doubleClick";
             item.tooltip = decodeURI(element.uri.replace(/^.*?\/Users\//g,'/Users/'));
             item.contextValue = "info";
             
